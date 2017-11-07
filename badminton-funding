@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Nov  5 10:52:53 2017
+
+@author: Went
+
+badminton funding
+
+"""
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt 
+
+
+name = ['fw','zxj','gp','lsh','cwc']
+attend = np.array([[1,1,1,1,1],
+                   [1,1,0,1,1],
+                   [1,0,1,0,0]])
+dayprice = np.array([16,40,20])
+day = list(range(1,np.size(attend,0)+1))
+df1 = pd.DataFrame({'day': np.sort(day*5),
+                       'person': name*len(day),
+                       'attend': attend.reshape(-1)},columns=['day','person','attend'])
+
+price_per = dayprice/np.sum(attend,1)
+df2 = pd.DataFrame({'day':day,
+                    'price_per': price_per
+                       })
+result = pd.merge(df1, df2, how='outer', on=['day'])
+total_per = result[result['attend']==1].groupby(['person'],as_index=1).sum()
+total_per['absent'] = [len(day)]*5-total_per['attend']
+#aa = pd.concat([person,attend], axis=1,ignore_index=True)
+#total_per.plot(secondary_y = ['price_per'])
+fig = plt.figure(figsize=(16,9),dpi=50, facecolor='w', edgecolor='k')
+ax1 = fig.add_subplot(111)
+total_per[['attend','absent']].plot(kind='bar',ax=ax1, stacked=True)
+plt.legend(['Attend','Absent'],loc='upper right',bbox_to_anchor=(1.4, 1.10),framealpha=0,fontsize=40)
+ax2 = ax1.twinx()  # this is the important function
+#total_per[['price_per']].plot(kind='line',ax=ax2,xlim=[-1,5],ylim=[0,np.max(total_per['price_per'])+3]);
+ax2.plot(range(len(name)),total_per['price_per'],color='red',marker='p',markersize=20,linewidth=5)
+ax2.set_ylim([np.min(total_per['price_per'])-5,np.max(total_per['price_per'])+10])
+ax1.set_xlabel('Name',fontsize=40)
+ax1.xaxis.set_tick_params(labelsize=40)
+ax2.yaxis.set_tick_params(labelsize=40)
+ax1.yaxis.set_tick_params(labelsize=40)
+
+ax1.spines['top'].set_visible(False)
+for i,j in zip(range(len(name)),total_per['price_per']):
+    ax2.annotate('%s)' %j, xy=(i,j), xytext=(10,15), textcoords='offset points',fontsize=30)
+    ax2.annotate('(cost:',xy=(i,j),xytext=(-80,15),textcoords='offset points',fontsize=30)
+#ax.barh(total_per['person'], total_per['attend'], align='center', color='green', ecolor='black')
+#ax.set_yticklabels(total_per['person'])
