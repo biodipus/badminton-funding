@@ -16,7 +16,7 @@ from cycler import cycler
 #%%
 name = ['fw','zxj','gp','lsh','cwc','wwh']
 attend = np.array([[1,0,1,0,0,0]])
-topay_day = list(range(1,2))
+topay_day = list(range(0,0))
 
 dayprice = np.array([16])
 day = list(range(1,np.size(attend,0)+1))
